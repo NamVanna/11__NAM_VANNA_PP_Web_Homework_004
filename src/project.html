@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Task Manager</title>
+<!-- <script src="https://cdn.tailwindcss.com"></script> -->
+ <link href="output.css" rel="stylesheet">
+</head>
+
+<body class="bg-cyan-100 p-6">
+
+<div class="max-w-3xl mx-auto mb-6">
+<h1 class="text-3xl font-bold mb-4">Task List</h1>
+<button id="openModal" class="bg-purple-700 text-white px-4 py-2 rounded">
+Add Task
+</button>
+</div>
+
+<div id="taskContainer" class="max-w-3xl mx-auto space-y-2">
+
+<div class="flex font-bold bg-white p-3 rounded">
+<div class="w-1/4">Task</div>
+<div class="w-1/4">Priority</div>
+<div class="w-1/4">Status</div>
+<div class="w-1/4">Action</div>
+</div>
+
+</div>
+
+
+<div id="modal" class="hidden fixed inset-0 bg-black/40 flex items-center justify-center">
+
+<div class="bg-white p-6 rounded w-96">
+
+<div class="flex justify-between mb-4">
+<h2 class="font-bold text-xl">Task</h2>
+<button id="closeModal">Close</button>
+</div>
+
+<input id="taskInput" type="text" placeholder="Task name"
+class="w-full border p-2 rounded mb-3">
+
+<select id="priority" class="w-full border p-2 rounded mb-3">
+<option value="">Select Priority</option>
+<option>High</option>
+<option>Medium</option>
+<option>Low</option>
+</select>
+
+<select id="status" class="w-full border p-2 rounded mb-3">
+<option value="">Select Status</option>
+<option>To Do</option>
+<option>Progress</option>
+<option>Done</option>
+</select>
+
+<button id="saveTask" class="bg-purple-700 text-white w-full py-2 rounded">
+Save
+</button>
+
+</div>
+</div>
+
+
+<script>
+
+let tasks = []
+let editIndex = -1
+
+const modal = document.getElementById("modal")
+const taskContainer = document.getElementById("taskContainer")
+
+const taskInput = document.getElementById("taskInput")
+const priorityInput = document.getElementById("priority")
+const statusInput = document.getElementById("status")
+
+document.getElementById("openModal").onclick = function(){
+modal.classList.remove("hidden")
+}
+
+document.getElementById("closeModal").onclick = function(){
+modal.classList.add("hidden")
+}
+
+document.getElementById("saveTask").onclick = function(){
+
+let name = taskInput.value
+let priority = priorityInput.value
+let status = statusInput.value
+
+if(name=="" || priority=="" || status==""){
+alert("Please fill all fields")
+return
+}
+
+let task = {
+name:name,
+priority:priority,
+status:status
+}
+
+if(editIndex == -1){
+tasks.push(task)
+}else{
+tasks[editIndex] = task
+editIndex = -1
+}
+
+clearForm()
+renderTasks()
+modal.classList.add("hidden")
+
+}
+
+
+function renderTasks(){
+
+document.querySelectorAll(".task-row").forEach(row=>row.remove())
+
+for(let i=0;i<tasks.length;i++){
+
+let task = tasks[i]
+
+let row = document.createElement("div")
+row.className = "flex bg-white p-3 rounded task-row"
+
+row.innerHTML = `
+<div class="w-1/4">${task.name}</div>
+<div class="w-1/4">${task.priority}</div>
+<div class="w-1/4">${task.status}</div>
+
+<div class="w-1/4">
+<button class="edit-btn" data-index="${i}">Edit</button>
+<button class="delete-btn text-red-500" data-index="${i}">Delete</button>
+</div>
+`
+
+taskContainer.appendChild(row)
+
+}
+
+}
+
+
+taskContainer.onclick = function(e){
+
+let index = e.target.dataset.index
+
+if(e.target.classList.contains("delete-btn")){
+
+tasks.splice(index,1)
+renderTasks()
+
+}
+
+if(e.target.classList.contains("edit-btn")){
+
+let task = tasks[index]
+
+taskInput.value = task.name
+priorityInput.value = task.priority
+statusInput.value = task.status
+
+editIndex = index
+modal.classList.remove("hidden")
+
+}
+
+}
+
+
+function clearForm(){
+
+taskInput.value = ""
+priorityInput.value = ""
+statusInput.value = ""
+
+}
+
+</script>
+
+</body>
+</html>
